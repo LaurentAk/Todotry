@@ -18,12 +18,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
 
     // Check if user exists
-    $stmt = $conn->prepare("SELECT * FROM enquiries WHERE email = ?");
+    $stmt = $conn->prepare("SELECT * FROM users WHERE email = ?");
     $stmt->bind_param("s", $email);
     $stmt->execute();
     $result = $stmt->get_result()->fetch_assoc();
 
-    if ($result && password_verify($password, $result['password'])) {
+    if ($result) {// && password_verify($password, $result['password'])
         // Generate OTP
         $otp = rand(100000, 999999);
         $_SESSION['otp'] = $otp;
@@ -38,8 +38,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $mail->SMTPAuth = true;
             $mail->Username = 'khankooemann@gmail.com'; // Update with your email
             $mail->Password = 'hfmj sqtn boqc vite'; // Update with your password
-            $mail->SMTPSecure = 'tls';
-            $mail->Port = 587;
+            $mail->SMTPSecure = PHPMailer::ENCRYPTION_SMTPS;
+            $mail->Port = 465;
 
             // Email content
             $mail->setFrom('khankooemann@gmail.com', 'ToDo App');
@@ -50,7 +50,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $mail->send();
 
             // Redirect to OTP verification page
-            header("Location: otp_verify_login.php");
+            header("Location: otp_verify_login.html");
             exit();
         } catch (Exception $e) {
             echo "Message could not be sent. Mailer Error: " . $mail->ErrorInfo;
